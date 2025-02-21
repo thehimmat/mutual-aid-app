@@ -58,4 +58,34 @@ class Database {
             throw new Exception("Failed to create initial admin: " . $e->getMessage());
         }
     }
+
+    public function updateInventoryItem($itemId, $data) {
+        try {
+            $allowedFields = ['name', 'quantity', 'category', 'urgency', 'description'];
+            $updates = array_intersect_key($data, array_flip($allowedFields));
+            
+            if (empty($updates)) {
+                return false;
+            }
+            
+            $sql = "UPDATE inventory SET ";
+            $setParts = [];
+            $params = [];
+            
+            foreach ($updates as $field => $value) {
+                $setParts[] = "$field = ?";
+                $params[] = $value;
+            }
+            
+            $sql .= implode(', ', $setParts);
+            $sql .= " WHERE id = ?";
+            $params[] = $itemId;
+            
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute($params);
+        } catch (PDOException $e) {
+            error_log("Error updating inventory item: " . $e->getMessage());
+            return false;
+        }
+    }
 } 

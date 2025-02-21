@@ -1,7 +1,35 @@
 import InventoryHeader from './InventoryHeader';
 import InventoryItem from './InventoryItem';
+import { useState } from 'react';
+import { API_BASE_URL } from '../config';
 
-function InventoryList({ items, isAdmin, onDelete }) {
+function InventoryList({ items: initialItems, isAdmin, onDelete }) {
+  const [items, setItems] = useState(initialItems);
+
+  const handleUpdate = async (updatedItem) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/inventory/${updatedItem.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedItem),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update item');
+      }
+
+      // Update local state
+      setItems(items.map(item => 
+        item.id === updatedItem.id ? updatedItem : item
+      ));
+    } catch (error) {
+      console.error('Error updating item:', error);
+      alert('Failed to update item');
+    }
+  };
+
   return (
     <div className="w-full max-w-[1200px] bg-white rounded-lg shadow overflow-hidden">
       <table className="w-full table-fixed">
@@ -12,28 +40,18 @@ function InventoryList({ items, isAdmin, onDelete }) {
             <th className="p-4 text-left w-[150px]">Category</th>
             <th className="p-4 text-left">Description</th>
             <th className="p-4 text-left w-[100px]">Urgency</th>
-            {isAdmin && <th className="p-4 text-left w-[100px]">Actions</th>}
+            {isAdmin && <th className="p-4 text-left w-[180px]">Actions</th>}
           </tr>
         </thead>
         <tbody>
           {items.map(item => (
-            <tr key={item.id} className={`border-b ${urgencyColors[item.urgency]}`}>
-              <td className="p-4 truncate">{item.name}</td>
-              <td className="p-4">{item.quantity}</td>
-              <td className="p-4">{item.category}</td>
-              <td className="p-4 truncate">{item.description || '-'}</td>
-              <td className="p-4">{item.urgency}</td>
-              {isAdmin && (
-                <td className="p-4">
-                  <button 
-                    onClick={() => onDelete(item.id)} 
-                    className="delete-btn"
-                  >
-                    Delete
-                  </button>
-                </td>
-              )}
-            </tr>
+            <InventoryItem
+              key={item.id}
+              item={item}
+              isAdmin={isAdmin}
+              onDelete={onDelete}
+              onUpdate={handleUpdate}
+            />
           ))}
         </tbody>
       </table>

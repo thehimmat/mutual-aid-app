@@ -38,7 +38,10 @@ try {
         }
     } elseif (preg_match('/\/api\/inventory\/(\d+)/', $uri, $matches)) {
         $id = $matches[1];
-        if ($method === 'DELETE') {
+        if ($method === 'PUT') {
+            $data = json_decode(file_get_contents('php://input'), true);
+            echo json_encode($inventoryController->update($id, $data));
+        } elseif ($method === 'DELETE') {
             echo json_encode($inventoryController->delete($id));
         } else {
             http_response_code(405);

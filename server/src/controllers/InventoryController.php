@@ -36,4 +36,41 @@ class InventoryController {
         $stmt->execute([':id' => $id]);
         return ['success' => true];
     }
+
+    // PUT /api/inventory/{id}
+    public function update($id, $data) {
+        try {
+            $allowedFields = ['name', 'quantity', 'category', 'urgency', 'description'];
+            $updates = array_intersect_key($data, array_flip($allowedFields));
+            
+            if (empty($updates)) {
+                return ['error' => 'No valid fields to update'];
+            }
+            
+            $sql = "UPDATE inventory SET ";
+            $setParts = [];
+            $params = [];
+            
+            foreach ($updates as $field => $value) {
+                $setParts[] = "$field = :$field";
+                $params[":$field"] = $value;
+            }
+            
+            $sql .= implode(', ', $setParts);
+            $sql .= " WHERE id = :id";
+            $params[':id'] = $id;
+            
+            $stmt = $this->db->prepare($sql);
+            $success = $stmt->execute($params);
+            
+            if ($success) {
+                return ['success' => true];
+            } else {
+                return ['error' => 'Failed to update item'];
+            }
+        } catch (PDOException $e) {
+            error_log("Error updating inventory item: " . $e->getMessage());
+            return ['error' => 'Database error occurred'];
+        }
+    }
 } 
