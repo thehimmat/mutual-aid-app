@@ -5,7 +5,8 @@ class Database {
 
     public function __construct() {
         try {
-            $this->db = new PDO('sqlite:' . __DIR__ . '/../../db/inventory.sqlite');
+            $dbPath = getenv('DB_PATH') ?: __DIR__ . '/../../db/inventory.sqlite';
+            $this->db = new PDO('sqlite:' . $dbPath);
             $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->createTables();
         } catch(PDOException $e) {
