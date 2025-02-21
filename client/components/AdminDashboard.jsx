@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import InventoryList from './InventoryList'
-import InventoryFilter from './InventoryFilter'
+import { API_BASE_URL } from '../config';
+import InventoryList from './InventoryList';
+import InventoryFilter from './InventoryFilter';
 
 function AdminDashboard() {
   const [inventory, setInventory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [newItem, setNewItem] = useState({
     name: '',
     quantity: '',
@@ -12,6 +15,7 @@ function AdminDashboard() {
     urgency: 'low',
     description: ''
   });
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,18 +29,21 @@ function AdminDashboard() {
 
   const fetchInventory = async () => {
     try {
-      const response = await fetch('/api/inventory');
+      const response = await fetch(`${API_BASE_URL}/inventory`);
+      if (!response.ok) throw new Error('Failed to fetch inventory');
       const data = await response.json();
       setInventory(data);
-    } catch (error) {
-      console.error('Error fetching inventory:', error);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/inventory', {
+      const response = await fetch(`${API_BASE_URL}/inventory`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,44 +52,46 @@ function AdminDashboard() {
         body: JSON.stringify(newItem)
       });
 
-      if (response.ok) {
-        setNewItem({
-          name: '',
-          quantity: '',
-          category: 'food',
-          urgency: 'low',
-          description: ''
-        });
-        fetchInventory();
-      }
+      if (!response.ok) throw new Error('Failed to create item');
+      
+      setNewItem({
+        name: '',
+        quantity: '',
+        category: 'food',
+        urgency: 'low',
+        description: ''
+      });
+      fetchInventory();
     } catch (error) {
-      console.error('Error adding item:', error);
+      setError(error.message);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`/api/inventory/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/inventory/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
-      if (response.ok) {
-        fetchInventory();
-      }
+      if (!response.ok) throw new Error('Failed to delete item');
+      fetchInventory();
     } catch (error) {
-      console.error('Error deleting item:', error);
+      setError(error.message);
     }
   };
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <div className="admin-dashboard">
-      <h2>Admin Dashboard</h2>
+      <h1>Admin Dashboard</h1>
       
       <form onSubmit={handleSubmit} className="add-item-form">
-        <h3>Add New Item</h3>
+        <h2>Add New Item</h2>
         <input
           type="text"
           placeholder="Item Name"
@@ -94,7 +103,7 @@ function AdminDashboard() {
           type="number"
           placeholder="Quantity"
           value={newItem.quantity}
-          onChange={(e) => setNewItem({...newItem, quantity: e.target.value})}
+          onChange={(e) => setNewItem({...newItem, quantity: parseInt(e.target.value)})}
           required
         />
         <select
@@ -102,16 +111,18 @@ function AdminDashboard() {
           onChange={(e) => setNewItem({...newItem, category: e.target.value})}
         >
           <option value="food">Food</option>
+          <option value="hygiene">Hygiene</option>
           <option value="medical">Medical</option>
           <option value="clothing">Clothing</option>
+          <option value="other">Other</option>
         </select>
         <select
           value={newItem.urgency}
           onChange={(e) => setNewItem({...newItem, urgency: e.target.value})}
         >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
           <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
         </select>
         <textarea
           placeholder="Description"
@@ -121,19 +132,13 @@ function AdminDashboard() {
         <button type="submit">Add Item</button>
       </form>
 
-      <div className="inventory-list admin">
-        <h3>Current Inventory</h3>
-        {inventory.map(item => (
-          <div key={item.id} className="inventory-item admin">
-            <h4>{item.name}</h4>
-            <p>Quantity: {item.quantity}</p>
-            <p>Category: {item.category}</p>
-            <p>Urgency: {item.urgency}</p>
-            <button onClick={() => handleDelete(item.id)} className="delete-btn">
-              Delete
-            </button>
-          </div>
-        ))}
+      <div className="inventory-section">
+        <h2>Current Inventory</h2>
+        <InventoryList 
+          items={inventory} 
+          isAdmin={true} 
+          onDelete={handleDelete}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import InventoryItem from './InventoryItem';
 
-function InventoryList({ items }) {
+function InventoryList({ items, isAdmin, onDelete }) {
   return (
     <div className="inventory-list">
       {items.length === 0 ? (
@@ -14,6 +14,13 @@ function InventoryList({ items }) {
               <p>Category: {item.category}</p>
               <p>Urgency: {item.urgency}</p>
               {item.description && <p>{item.description}</p>}
+              {isAdmin && (
+                <div className="admin-actions">
+                  <button onClick={() => onDelete(item.id)} className="delete-btn">
+                    Delete
+                  </button>
+                </div>
+              )}
             </li>
           ))}
         </ul>
