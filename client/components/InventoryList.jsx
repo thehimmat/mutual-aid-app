@@ -1,23 +1,22 @@
 import InventoryItem from './InventoryItem';
 
-function InventoryList({ inventory, filters }) {
-  // Filter inventory based on selected filters
-  const filteredInventory = inventory.filter(item => {
-    const categoryMatch = filters.category === 'all' || item.category === filters.category;
-    const urgencyMatch = filters.urgency === 'all' || item.urgency === filters.urgency;
-    return categoryMatch && urgencyMatch;
-  });
-
+function InventoryList({ items }) {
   return (
     <div className="inventory-list">
-      {filteredInventory.length === 0 ? (
-        <p>No items found matching the selected filters.</p>
+      {items.length === 0 ? (
+        <p>No items found.</p>
       ) : (
-        <div className="inventory-grid">
-          {filteredInventory.map(item => (
-            <InventoryItem key={item.id} item={item} />
+        <ul>
+          {items.map(item => (
+            <li key={item.id} className={`urgency-${item.urgency}`}>
+              <h3>{item.name}</h3>
+              <p>Quantity: {item.quantity}</p>
+              <p>Category: {item.category}</p>
+              <p>Urgency: {item.urgency}</p>
+              {item.description && <p>{item.description}</p>}
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </div>
   );

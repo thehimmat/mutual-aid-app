@@ -1,14 +1,16 @@
 function InventoryFilter({ filters, setFilters }) {
   return (
-    <div className="inventory-filter">
+    <div className="inventory-filters">
       <select
         value={filters.category}
         onChange={(e) => setFilters({...filters, category: e.target.value})}
       >
         <option value="all">All Categories</option>
         <option value="food">Food</option>
+        <option value="hygiene">Hygiene</option>
         <option value="medical">Medical</option>
         <option value="clothing">Clothing</option>
+        <option value="other">Other</option>
         {/* Add more categories as needed */}
       </select>
 
