@@ -33,11 +33,11 @@ The **Mutual Aid Inventory App** is a simple tool designed to help a local mutua
 ```
 /mutual-aid-app
 │── /client (React Frontend)
-│   │── /src
-│   │   │── /components
-│   │   │── /pages
-│   │   │── /services
-│   │   └── /utils
+│   │── /components
+│   │── /assets
+│   │── /styles
+│   │── App.jsx
+│   │── main.jsx
 │   └── package.json
 │── /server (PHP Backend with SQLite)
 │   │── /public
