@@ -61,6 +61,52 @@ The **Mutual Aid Inventory App** is a simple tool designed to help a local mutua
 
 ## Setup Instructions
 
+### Quick Start
+1. Clone and enter the repository:
+```sh
+git clone <repository-url>
+cd mutual-aid-app
+```
+
+2. Set up backend:
+```sh
+cd server
+composer install
+cp .env.example .env
+```
+
+3. Set up frontend:
+```sh
+cd ../client
+npm install
+cp .env.example .env
+```
+
+4. Initialize database:
+```sh
+cd ..
+mkdir -p db
+touch db/inventory.sqlite
+php -f db/init.php
+```
+
+5. Start both servers:
+```sh
+# Terminal 1 - Backend
+cd server
+php -S localhost:8000 -t public
+
+# Terminal 2 - Frontend
+cd client
+npm run dev
+```
+
+6. Access the application:
+- Frontend: http://localhost:5173
+- API: http://localhost:8000/api
+
+### Detailed Setup
+
 ### Prerequisites
 - PHP 8.0 or higher
 - Composer
@@ -80,10 +126,6 @@ cp .env.example .env
 ```sh
 php -S localhost:8000 -t public
 ```
-4. Deploy to Heroku:
-```sh
-git push heroku main
-```
 
 ### Frontend (React)
 1. Install dependencies:
@@ -96,13 +138,16 @@ cp .env.example .env
 ```
 3. Start the development server:
 ```sh
-npm start
+npm run dev
 ```
 
 ## Database Setup
 
-1. Create a SQLite database file:
-```touch db/inventory.db```
+1. Create SQLite database directory and file:
+```sh
+mkdir -p db
+touch db/inventory.sqlite  # Changed from .db to match .env.example
+```
 
 2. Initialize the database:
 ```php -f db/init.php```
@@ -116,14 +161,21 @@ License
 
 This project is open-source and available for community use.
 
-## Contributing
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
 ## Security
 
-For security vulnerabilities, please contact [maintainer email].
+For security vulnerabilities, please contact himmat@khalsa.com
 
 ## Support
 
 For support questions, please open an issue in the GitHub repository.
+
+### Default Admin Access
+After initialization, you can log in with these credentials:
+- Username: admin
+- Password: admin123
+
+**Important**: Change these credentials before deploying to production.
+
+### Current Implementation Notes
+- The authentication system currently uses a simplified token system. Full JWT implementation is planned for the next release.
+- The API endpoints are configured but some security middleware is pending implementation.
