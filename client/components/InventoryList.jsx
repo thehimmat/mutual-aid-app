@@ -1,32 +1,50 @@
+import InventoryHeader from './InventoryHeader';
 import InventoryItem from './InventoryItem';
 
 function InventoryList({ items, isAdmin, onDelete }) {
   return (
-    <div className="inventory-list">
-      {items.length === 0 ? (
-        <p>No items found.</p>
-      ) : (
-        <ul>
+    <div className="w-full max-w-[1200px] bg-white rounded-lg shadow overflow-hidden">
+      <table className="w-full table-fixed">
+        <thead>
+          <tr className="border-b">
+            <th className="p-4 text-left w-[200px]">Name</th>
+            <th className="p-4 text-left w-[100px]">Quantity</th>
+            <th className="p-4 text-left w-[150px]">Category</th>
+            <th className="p-4 text-left">Description</th>
+            <th className="p-4 text-left w-[100px]">Urgency</th>
+            {isAdmin && <th className="p-4 text-left w-[100px]">Actions</th>}
+          </tr>
+        </thead>
+        <tbody>
           {items.map(item => (
-            <li key={item.id} className={`urgency-${item.urgency}`}>
-              <h3>{item.name}</h3>
-              <p>Quantity: {item.quantity}</p>
-              <p>Category: {item.category}</p>
-              <p>Urgency: {item.urgency}</p>
-              {item.description && <p>{item.description}</p>}
+            <tr key={item.id} className={`border-b ${urgencyColors[item.urgency]}`}>
+              <td className="p-4 truncate">{item.name}</td>
+              <td className="p-4">{item.quantity}</td>
+              <td className="p-4">{item.category}</td>
+              <td className="p-4 truncate">{item.description || '-'}</td>
+              <td className="p-4">{item.urgency}</td>
               {isAdmin && (
-                <div className="admin-actions">
-                  <button onClick={() => onDelete(item.id)} className="delete-btn">
+                <td className="p-4">
+                  <button 
+                    onClick={() => onDelete(item.id)} 
+                    className="delete-btn"
+                  >
                     Delete
                   </button>
-                </div>
+                </td>
               )}
-            </li>
+            </tr>
           ))}
-        </ul>
-      )}
+        </tbody>
+      </table>
     </div>
   );
 }
+
+const urgencyColors = {
+  high: 'bg-red-100',
+  medium: 'bg-yellow-100',
+  low: 'bg-green-100'
+};
 
 export default InventoryList; 

@@ -1,4 +1,4 @@
-function InventoryItem({ item }) {
+function InventoryItem({ item, isAdmin, onDelete }) {
   const urgencyColors = {
     high: 'bg-red-100',
     medium: 'bg-yellow-100',
@@ -6,16 +6,28 @@ function InventoryItem({ item }) {
   };
 
   return (
-    <div className={`inventory-item ${urgencyColors[item.urgency]} p-4 rounded-lg shadow`}>
-      <h3 className="text-xl font-semibold">{item.name}</h3>
-      <div className="item-details">
-        <p className="text-gray-600">Quantity: {item.quantity}</p>
-        <p className="text-gray-600">Category: {item.category}</p>
-        <p className={`urgency-badge ${item.urgency}`}>
-          Urgency: {item.urgency}
-        </p>
-        {item.description && (
-          <p className="text-gray-700 mt-2">{item.description}</p>
+    <div className={`${urgencyColors[item.urgency]} p-4 flex items-center justify-between gap-4 overflow-hidden border-b`}>
+      <div className="w-[150px] truncate shrink-0 font-medium">{item.name}</div>
+
+      <div className="flex flex-1 items-center gap-4 min-w-0">
+        <div className="w-[100px] shrink-0">{item.quantity}</div>
+        <div className="w-[100px] shrink-0">{item.category}</div>
+        <div className="flex-1 truncate min-w-0">
+          {item.description || '-'}
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 shrink-0">
+        <div className="w-[100px] whitespace-nowrap">{item.urgency}</div>
+        {isAdmin && (
+          <div className="w-[80px]">
+            <button 
+              onClick={() => onDelete(item.id)} 
+              className="delete-btn"
+            >
+              Delete
+            </button>
+          </div>
         )}
       </div>
     </div>
